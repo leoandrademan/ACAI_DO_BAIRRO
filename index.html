@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#642b83">
+    <meta name="description" content="Monte seu açaí e peça sua entrega.">
+    <title>Açaí do Bairro - Monte seu Açaí</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header class="topo">
+        <h1>Açaí do Bairro</h1>
+        <p>Monte seu açaí do seu jeito!</p>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>1. Seus dados para entrega</h2>
+
+            <div class="campo">
+                <label for="nome">Nome completo *</label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="nome"
+                    autocomplete="name"
+                    maxlength="100"
+                    placeholder="Digite seu nome"
+                    required
+                >
+            </div>
+
+            <div class="campo">
+                <label for="telefone">Telefone com DDD *</label>
+                <input
+                    type="tel"
+                    id="telefone"
+                    name="telefone"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    maxlength="16"
+                    placeholder="(41) 99999-9999"
+                    aria-describedby="ajuda-telefone"
+                    required
+                >
+                <small id="ajuda-telefone">
+                    Informe o DDD e o número de telefone.
+                </small>
+            </div>
+
+            <div class="campo">
+                <label for="bairro">Bairro de entrega *</label>
+                <select id="bairro" name="bairro" required>
+                    <option value="">Selecione seu bairro</option>
+
+                    <optgroup label="A - C">
+                        <option>Águas Claras</option>
+                        <option>Balbino Cunha</option>
+                        <option>Bateias (Distrito)</option>
+                        <option>Boa Vista</option>
+                        <option>Bom Jesus</option>
+                        <option>Botiatuva</option>
+                        <option>Cambuí</option>
+                        <option>Campo do Meio</option>
+                        <option value="Centro">Centro</option>
+                        <option>Cercadinho</option>
+                        <option>Chacrinha Nossa Senhora do Rocio</option>
+                        <option>Colônia Antônio Rebouças</option>
+                        <option>Colônia Dom Pedro</option>
+                        <option>Colônia Figueiredo</option>
+                        <option>Colônia Monte Claro</option>
+                        <option>Conjunto Habitacional Monsenhor Francisco Gorski</option>
+                        <option>Cristo Rei</option>
+                    </optgroup>
+
+                    <optgroup label="F - J">
+                        <option>Fazendinha</option>
+                        <option>Ferraria</option>
+                        <option>Itaboa (Loteamento)</option>
+                        <option>Itaqui</option>
+                        <option>Itaqui de Cima</option>
+                        <option>Jardim Bela Vista</option>
+                        <option>Jardim Busmayer</option>
+                        <option>Jardim Carmela</option>
+                        <option>Jardim Céu Azul</option>
+                        <option>Jardim das Acácias</option>
+                        <option>Jardim das Américas</option>
+                        <option>Jardim das Palmas</option>
+                        <option>Jardim Emília</option>
+                        <option>Jardim Habitalar</option>
+                        <option>Jardim Iruama</option>
+                        <option>Jardim Itaqui</option>
+                        <option>Jardim Itália</option>
+                        <option>Jardim Keli Cristina</option>
+                        <option>Jardim Melyane</option>
+                        <option>Jardim Nossa Senhora do Perpétuo Socorro</option>
+                        <option>Jardim Santa Nely</option>
+                        <option>Jardim São Vicente</option>
+                        <option>Jardim Serrinha</option>
+                        <option>Jardim Social</option>
+                    </optgroup>
+
+                    <optgroup label="L - O">
+                        <option>Loteamento Miranda</option>
+                        <option>Loteamento Ouro Verde I e II</option>
+                        <option>Loteamento São José</option>
+                        <option>Miqueleto</option>
+                        <option>Nossa Senhora Aparecida</option>
+                        <option>Nossa Senhora do Pilar</option>
+                        <option>Ouro Verde</option>
+                    </optgroup>
+
+                    <optgroup label="P - V">
+                        <option>Passaúna</option>
+                        <option>Rivabem</option>
+                        <option>Rondinha</option>
+                        <option>Salgadinho</option>
+                        <option>São Caetano</option>
+                        <option>São Francisco</option>
+                        <option>São João do Povinho</option>
+                        <option>São Luiz</option>
+                        <option>Sítio Santa Ana</option>
+                        <option>Timbotuva</option>
+                        <option>Vila Bancária</option>
+                        <option>Vila David Antônio</option>
+                        <option>Vila De Lourdes / Delurdes</option>
+                        <option>Vila Elizabeth</option>
+                        <option>Vila Gilcy</option>
+                        <option>Vila Itaqui</option>
+                        <option>Vila Kuster</option>
+                        <option>Vila Nossa Senhora do Carmo</option>
+                        <option>Vila Nova</option>
+                        <option>Vila Operária</option>
+                        <option>Vila Pompeia</option>
+                        <option>Vila Rivabem</option>
+                        <option>Vila Santa Terezinha</option>
+                        <option>Vila São Luiz</option>
+                        <option>Vila Solene</option>
+                        <option>Vila Verde</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <p class="aviso">* Campos obrigatórios para confirmar o pedido.</p>
+        </section>
+
+        <section class="card">
+            <h2>2. Escolha o tamanho</h2>
+
+            <div class="tamanhos">
+                <label class="opcao-tamanho">
+                    <input type="radio" name="tamanho"
+                           value="300" data-preco="12" checked>
+                    <span>Pequeno</span>
+                    <strong>300 ml</strong>
+                    <span>R$ 12,00</span>
+                </label>
+
+                <label class="opcao-tamanho">
+                    <input type="radio" name="tamanho"
+                           value="500" data-preco="16">
+                    <span>Médio</span>
+                    <strong>500 ml</strong>
+                    <span>R$ 16,00</span>
+                </label>
+
+                <label class="opcao-tamanho">
+                    <input type="radio" name="tamanho"
+                           value="700" data-preco="21">
+                    <span>Grande</span>
+                    <strong>700 ml</strong>
+                    <span>R$ 21,00</span>
+                </label>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>3. Escolha os adicionais</h2>
+            <p class="descricao">
+                Selecione os ingredientes desejados.
+                O preço de cada adicional será somado ao pedido.
+            </p>
+
+            <div class="adicionais">
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Leite em pó" data-preco="2">
+                    <span>Leite em pó</span>
+                    <strong>+ R$ 2,00</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Banana" data-preco="2">
+                    <span>Banana</span>
+                    <strong>+ R$ 2,00</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Granola" data-preco="2.5">
+                    <span>Granola</span>
+                    <strong>+ R$ 2,50</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Leite condensado" data-preco="2.5">
+                    <span>Leite condensado</span>
+                    <strong>+ R$ 2,50</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Morango" data-preco="3">
+                    <span>Morango</span>
+                    <strong>+ R$ 3,00</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Paçoca" data-preco="2">
+                    <span>Paçoca</span>
+                    <strong>+ R$ 2,00</strong>
+                </label>
+
+                <label class="item">
+                    <input type="checkbox" name="adicional"
+                           value="Nutella" data-preco="4">
+                    <span>Nutella</span>
+                    <strong>+ R$ 4,00</strong>
+                </label>
+            </div>
+        </section>
+
+        <section class="card resumo">
+            <h2>4. Resumo do pedido</h2>
+
+            <p>Tamanho: <strong id="resumo-tamanho">300 ml</strong></p>
+
+            <p>Adicionais selecionados:</p>
+            <ul id="lista-adicionais">
+                <li>Nenhum adicional</li>
+            </ul>
+
+            <div class="linha-valor">
+                <span>Subtotal do açaí</span>
+                <strong id="subtotal">R$ 12,00</strong>
+            </div>
+
+            <div class="linha-valor">
+                <span>Taxa de entrega (<span id="resumo-bairro">selecione o bairro</span>)</span>
+                <strong id="taxa-entrega">—</strong>
+            </div>
+
+            <div class="total">
+                <span>Total do pedido</span>
+                <strong id="valor-total">—</strong>
+            </div>
+
+            <button id="btn-confirmar" type="button">
+                Confirmar pedido
+            </button>
+
+            <p id="mensagem" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 Açaí do Bairro — Feito com carinho 💜</p>
+    </footer>
+</body>
+</html>
