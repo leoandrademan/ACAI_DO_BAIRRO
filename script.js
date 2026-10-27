@@ -1,8 +1,9 @@
-
 'use strict';
 
 const tamanhos = document.querySelectorAll('input[name="tamanho"]');
 const adicionais = document.querySelectorAll('input[name="adicional"]');
+const modosEntrega = document.querySelectorAll('input[name="modo_entrega"]');
+const lgpdCheckbox = document.getElementById('lgpd');
 
 const nomeInput = document.getElementById('nome');
 const telefoneInput = document.getElementById('telefone');
@@ -10,11 +11,11 @@ const bairroInput = document.getElementById('bairro');
 
 const resumoTamanho = document.getElementById('resumo-tamanho');
 const listaAdicionais = document.getElementById('lista-adicionais');
+const resumoEntrega = document.getElementById('resumo-entrega');
 const subtotalElemento = document.getElementById('subtotal');
 const taxaElemento = document.getElementById('taxa-entrega');
 const resumoBairro = document.getElementById('resumo-bairro');
 const valorTotal = document.getElementById('valor-total');
-
 const botaoConfirmar = document.getElementById('btn-confirmar');
 const mensagem = document.getElementById('mensagem');
 
@@ -29,13 +30,11 @@ function obterLimite(volume) {
 }
 
 function formatarMoeda(valor) {
-    return valor.toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-function obterTaxa(bairro) {
+function obterTaxa(bairro, modoEntrega) {
+    if (modoEntrega === 'Balcao') return 0;
     if (!bairro) return null;
     return bairro === 'Centro' ? 5 : 10;
 }
@@ -55,17 +54,16 @@ function obterSelecionados() {
 }
 
 function atualizarPedido() {
-    const tamanho = document.querySelector(
-        'input[name="tamanho"]:checked'
-    );
-
+    const tamanho = document.querySelector('input[name="tamanho"]:checked');
     const volume = tamanho.value;
     const precoBase = Number(tamanho.dataset.preco);
     const selecionados = obterSelecionados();
+    
+    const modoSelecionado = document.querySelector('input[name="modo_entrega"]:checked');
+    const modoEntregaValor = modoSelecionado ? modoSelecionado.value : null;
 
     resumoTamanho.textContent = `${volume} ml`;
     listaAdicionais.replaceChildren();
-
     subtotalAtual = precoBase;
 
     if (selecionados.length === 0) {
@@ -76,30 +74,36 @@ function atualizarPedido() {
         selecionados.forEach(adicional => {
             const preco = Number(adicional.dataset.preco);
             subtotalAtual += preco;
-
             const item = document.createElement('li');
-            item.textContent =
-                `${adicional.value} — ${formatarMoeda(preco)}`;
-
+            item.textContent = `${adicional.value} — ${formatarMoeda(preco)}`;
             listaAdicionais.appendChild(item);
         });
     }
 
     const limite = obterLimite(volume);
     const contador = document.createElement('li');
-
-    contador.textContent = Number.isFinite(limite)
-        ? `Adicionais: ${selecionados.length} de ${limite}`
+    contador.textContent = Number.isFinite(limite) 
+        ? `Adicionais: ${selecionados.length} de ${limite}` 
         : `Adicionais selecionados: ${selecionados.length}`;
-
     listaAdicionais.appendChild(contador);
 
     subtotalElemento.textContent = formatarMoeda(subtotalAtual);
 
-    const bairro = bairroInput.value;
-    resumoBairro.textContent = bairro || 'selecione o bairro';
+    if (modoSelecionado) {
+        const nomesModos = {
+            'Balcao': 'Retirada no Balcão',
+            'Motoboy': 'Motoboy Próprio',
+            'Terceirizado': 'Entrega Parceira Terceirizada'
+        };
+        resumoEntrega.textContent = nomesModos[modoEntregaValor];
+    } else {
+        resumoEntrega.textContent = 'Não selecionado';
+    }
 
-    taxaAtual = obterTaxa(bairro);
+    const bairro = bairroInput.value;
+    resumoBairro.textContent = modoEntregaValor === 'Balcao' ? 'N/A (Balcão)' : (bairro || 'selecione o bairro');
+
+    taxaAtual = obterTaxa(bairro, modoEntregaValor);
 
     if (taxaAtual === null) {
         taxaElemento.textContent = '—';
@@ -114,27 +118,19 @@ function atualizarPedido() {
 
 function validarTelefone() {
     const digitos = telefoneInput.value.replace(/\D/g, '');
-
-    // Aceita telefone fixo ou celular brasileiro com DDD.
     const valido = digitos.length === 10 || digitos.length === 11;
-
     telefoneInput.setCustomValidity(
-        valido
-            ? ''
-            : 'Informe um telefone válido com DDD, incluindo o código de área.'
+        valido ? '' : 'Informe um telefone válido com DDD, incluindo o código de área.'
     );
-
     return valido;
 }
 
 function validarNome() {
     const nome = nomeInput.value.trim();
     const valido = nome.length >= 2;
-
     nomeInput.setCustomValidity(
         valido ? '' : 'Informe seu nome completo.'
     );
-
     return valido;
 }
 
@@ -142,15 +138,21 @@ function validarPedido() {
     validarNome();
     validarTelefone();
 
+    const modoSelecionado = document.querySelector('input[name="modo_entrega"]:checked');
+
     if (!nomeInput.value.trim()) {
         nomeInput.setCustomValidity('O nome é obrigatório.');
     }
-
     if (!telefoneInput.value.trim()) {
         telefoneInput.setCustomValidity('O telefone com DDD é obrigatório.');
     }
+    
+    if (!modoSelecionado) {
+        mostrarMensagem('Selecione uma modalidade de entrega.');
+        return false;
+    }
 
-    if (!bairroInput.value) {
+    if (modoSelecionado.value !== 'Balcao' && !bairroInput.value) {
         bairroInput.setCustomValidity('Selecione seu bairro.');
     } else {
         bairroInput.setCustomValidity('');
@@ -160,44 +162,41 @@ function validarPedido() {
         nomeInput.reportValidity();
         return false;
     }
-
     if (!telefoneInput.checkValidity()) {
         telefoneInput.reportValidity();
         return false;
     }
-
-    if (!bairroInput.checkValidity()) {
+    if (modoSelecionado.value !== 'Balcao' && !bairroInput.checkValidity()) {
         bairroInput.reportValidity();
         return false;
     }
 
-    const tamanho = document.querySelector(
-        'input[name="tamanho"]:checked'
-    );
+    if (!lgpdCheckbox.checked) {
+        lgpdCheckbox.setCustomValidity('Você deve aceitar os Termos da LGPD para concluir o pedido.');
+        lgpdCheckbox.reportValidity();
+        return false;
+    } else {
+        lgpdCheckbox.setCustomValidity('');
+    }
 
+    const tamanho = document.querySelector('input[name="tamanho"]:checked');
     const limite = obterLimite(tamanho.value);
-
     if (obterSelecionados().length > limite) {
-        mostrarMensagem(
-            `O copo de ${tamanho.value} ml permite até ${limite} adicionais.`
-        );
+        mostrarMensagem(`O copo de ${tamanho.value} ml permite até ${limite} adicionais.`);
         return false;
     }
 
     return true;
 }
 
-// Atualiza os valores ao alterar o tamanho.
 tamanhos.forEach(tamanho => {
     tamanho.addEventListener('change', () => {
         const limite = obterLimite(tamanho.value);
         const selecionados = obterSelecionados();
-
         if (selecionados.length > limite) {
             selecionados.slice(limite).forEach(item => {
                 item.checked = false;
             });
-
             mostrarMensagem(
                 `O copo de ${tamanho.value} ml permite até ${limite} adicionais. ` +
                 'Os adicionais excedentes foram removidos.'
@@ -205,36 +204,37 @@ tamanhos.forEach(tamanho => {
         } else {
             limparMensagem();
         }
-
         atualizarPedido();
     });
 });
 
-// Impede ultrapassar o limite de adicionais.
 adicionais.forEach(adicional => {
     adicional.addEventListener('change', () => {
-        const tamanho = document.querySelector(
-            'input[name="tamanho"]:checked'
-        );
-
+        const tamanho = document.querySelector('input[name="tamanho"]:checked');
         const limite = obterLimite(tamanho.value);
         const selecionados = obterSelecionados();
-
         if (selecionados.length > limite) {
             adicional.checked = false;
-
-            mostrarMensagem(
-                `Limite de ${limite} adicionais para o copo de ${tamanho.value} ml.`
-            );
+            mostrarMensagem(`Limite de ${limite} adicionais para o copo de ${tamanho.value} ml.`);
         } else {
             limparMensagem();
         }
-
         atualizarPedido();
     });
 });
 
-// Recalcula a taxa quando o cliente escolhe outro bairro.
+modosEntrega.forEach(modo => {
+    modo.addEventListener('change', () => {
+        limparMensagem();
+        atualizarPedido();
+    });
+});
+
+lgpdCheckbox.addEventListener('change', () => {
+    lgpdCheckbox.setCustomValidity('');
+    limparMensagem();
+});
+
 bairroInput.addEventListener('change', () => {
     bairroInput.setCustomValidity('');
     limparMensagem();
@@ -251,49 +251,43 @@ telefoneInput.addEventListener('input', () => {
     limparMensagem();
 });
 
-// Confirma somente após validar os dados e o valor total.
 botaoConfirmar.addEventListener('click', () => {
     if (!validarPedido()) return;
-
     atualizarPedido();
 
-    if (totalAtual === null || taxaAtual === null) {
+    const modoSelecionado = document.querySelector('input[name="modo_entrega"]:checked');
+
+    if (modoSelecionado.value !== 'Balcao' && (totalAtual === null || taxaAtual === null)) {
         mostrarMensagem('Selecione seu bairro para calcular a entrega.');
         bairroInput.reportValidity();
         return;
     }
 
-    const tamanho = document.querySelector(
-        'input[name="tamanho"]:checked'
-    );
-
+    const tamanho = document.querySelector('input[name="tamanho"]:checked');
     const selecionados = obterSelecionados().map(item => item.value);
     const nome = nomeInput.value.trim();
     const telefone = telefoneInput.value.trim();
-    const bairro = bairroInput.value;
-
-    const detalhes =
-        `CONFIRMAR PEDIDO - AÇAÍ DO BAIRRO\n\n` +
+    const bairro = modoSelecionado.value === 'Balcao' ? 'N/A (Retirada)' : bairroInput.value;
+    
+    const detalhes = `CONFIRMAR PEDIDO - AÇAÍ DO BAIRRO\n\n` +
         `Cliente: ${nome}\n` +
         `Telefone: ${telefone}\n` +
+        `Modo de Entrega: ${resumoEntrega.textContent}\n` +
         `Bairro: ${bairro}\n\n` +
         `Açaí: ${tamanho.value} ml\n` +
-        `Adicionais: ${selecionados.length
-            ? selecionados.join(', ')
-            : 'Nenhum'}\n` +
+        `Adicionais: ${selecionados.length ? selecionados.join(', ') : 'Nenhum'}\n` +
         `Subtotal do açaí: ${formatarMoeda(subtotalAtual)}\n` +
         `Taxa de entrega: ${formatarMoeda(taxaAtual)}\n` +
         `TOTAL: ${formatarMoeda(totalAtual)}\n\n` +
+        `Consentimento LGPD: Confirmado\n\n` +
         `Confirma essas informações?`;
 
     if (window.confirm(detalhes)) {
         mostrarMensagem(
             `Pedido confirmado na tela! Total: ${formatarMoeda(totalAtual)}. ` +
-            'Anote seus dados para referência.',
-            true
+            'Anote seus dados para referência.', true
         );
     }
 });
 
-// Calcula o subtotal inicial. A entrega depende do bairro selecionado.
 atualizarPedido();
